@@ -1,5 +1,5 @@
 const express = require('express');
-const { Pool, Client } = require('pg');
+const { Pool } = require('pg');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = express();
@@ -10,16 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
-// PostgreSQL connection configuration for default database (postgres)
-const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'postgres',
-    password: 'root',
-    port: 5432,
-});
-
-// PostgreSQL connection configuration for application database
+// PostgreSQL connection configuration
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -27,50 +18,6 @@ const pool = new Pool({
     password: 'root',
     port: 5432,
 });
-
-// Database initialization
-async function initializeDatabase() {
-    try {
-        // Connect to default postgres database
-        await client.connect();
-        
-        // Check if leave_management database exists
-        const dbCheck = await client.query(
-            "SELECT 1 FROM pg_database WHERE datname = 'leave_management'"
-        );
-        
-        // Create database if it doesn't exist
-        if (dbCheck.rows.length === 0) {
-            await client.query('CREATE DATABASE leave_management');
-            console.log('Database leave_management created successfully');
-        } else {
-            console.log('Database leave_management already exists');
-        }
-        
-        await client.end();
-        
-        // Initialize the table in leave_management database
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS leave_requests (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(50) NOT NULL,
-                employee_id VARCHAR(7) NOT NULL,
-                leave_type VARCHAR(50) NOT NULL,
-                start_date DATE NOT NULL,
-                end_date DATE NOT NULL,
-                comments TEXT NOT NULL,
-                status VARCHAR(20) DEFAULT 'pending',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT valid_employee_id CHECK (employee_id ~ '^ATS0[0-9]{3}$'),
-                CONSTRAINT valid_status CHECK (status IN ('pending', 'approved', 'rejected'))
-            )
-        `);
-        console.log('Table leave_requests initialized successfully');
-    } catch (error) {
-        console.error('Error initializing database:', error);
-        process.exit(1); // Exit process on initialization failure
-    }
-}
 
 // Validation middleware
 const validateLeaveRequest = (req, res, next) => {
@@ -235,7 +182,6 @@ app.delete('/api/leave-requests', async (req, res) => {
 });
 
 // Start server
-app.listen(port, async () => {
-    await initializeDatabase();
+app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

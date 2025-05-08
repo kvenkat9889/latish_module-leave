@@ -809,9 +809,43 @@
     </div>
 
     <script>
-        // Helper function to format date to YYYY-MM-DD
-        function formatDate(dateString) {
-            return new Date(dateString).toISOString().split('T')[0];
+        // Updated formatDate function to handle multiple input types
+        function formatDate(dateInput) {
+            // Handle case where input is undefined or null
+            if (!dateInput) {
+                console.error('Invalid dateInput: input is undefined or null', dateInput);
+                return 'Invalid Date';
+            }
+
+            let date;
+
+            // If the input is already a Date object, use it directly
+            if (dateInput instanceof Date) {
+                date = dateInput;
+            } else if (typeof dateInput === 'string') {
+                // If the input is a string, try to parse it
+                // First, check if it matches YYYY-MM-DD format
+                const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+                if (dateFormatRegex.test(dateInput)) {
+                    const [year, month, day] = dateInput.split('-').map(Number);
+                    date = new Date(year, month - 1, day);
+                } else {
+                    // If it doesn't match YYYY-MM-DD, try parsing it as an ISO string (e.g., 2025-05-09T00:00:00.000Z)
+                    date = new Date(dateInput);
+                }
+            } else {
+                console.error('Invalid dateInput: must be a string or Date object', dateInput);
+                return 'Invalid Date';
+            }
+
+            // Check if the Date object is valid
+            if (isNaN(date.getTime())) {
+                console.error('Invalid Date object created from:', dateInput);
+                return 'Invalid Date';
+            }
+
+            // Format the date to YYYY-MM-DD
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
         // Prevent space key in search input
@@ -834,6 +868,9 @@
                 const response = await fetch(`http://localhost:3000/api/leave-requests?${query}`);
                 const requests = await response.json();
                 
+                // Log the raw API response
+                console.log('API Response:', requests);
+                
                 const tableBody = document.getElementById('leaveTableBody');
                 const tableContainer = document.getElementById('tableContainer');
                 const noRecords = document.getElementById('noRecords');
@@ -847,6 +884,9 @@
                     
                     tableBody.innerHTML = '';
                     requests.forEach(request => {
+                        // Log the start_date and end_date for each request
+                        console.log('Request ID:', request.id, 'Start Date:', request.start_date, 'End Date:', request.end_date);
+                        
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${request.id}"></td>
@@ -879,6 +919,9 @@
                     throw new Error('Failed to fetch leave details');
                 }
                 const request = await response.json();
+                
+                // Log the start_date and end_date for the modal
+                console.log('View Leave Details - Request ID:', requestId, 'Start Date:', request.start_date, 'End Date:', request.end_date);
                 
                 const modal = document.getElementById('leaveModal');
                 const detailsDiv = document.getElementById('leaveDetails');
