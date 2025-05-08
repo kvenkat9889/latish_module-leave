@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6b8afd;
+            --primary-light: #e9eeff;
+            --success-color: #4caf50;
+            --danger-color: #ff5252;
+            --warning-color: #ffc107;
+            --text-color: #333;
+            --bg-color: #f8faff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 0px;
+            box-sizing: border-box;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #5474e5);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            padding: 10px 0;
+            font-size: 32px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            height: 40px;
+            background-color: white;
+        }
+
+        input {
+            padding: 8px 8px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            height: 40px;
+            box-sizing: border-box;
+        }
+
+        .leave-table-container {
+            overflow-x: auto;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .leave-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 800px;
+        }
+
+        .leave-table th, 
+        .leave-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .leave-table th {
+            background-color: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .leave-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending { 
+            background-color: var(--warning-color); 
+            color: #333; 
+        }
+
+        .status-approved { 
+            background-color: var(--success-color); 
+            color: white; 
+        }
+
+        .status-rejected { 
+            background-color: var(--danger-color); 
+            color: white; 
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            height: 40px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-approve {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 550px;
+            margin: 50px auto;
+            padding: 0;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: #f7f9fc;
+            border-bottom: 1px solid #edf1f7;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #3e4b5b;
+            font-weight: 600;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 22px;
+            color: #adb5bd;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: #495057;
+            background-color: #e9ecef;
+        }
+
+        #leaveDetails {
+            padding: 20px;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .detail-item {
+            padding: 12px 0;
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            flex: 0 0 130px;
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 14px;
+            padding-right: 15px;
+        }
+
+        .detail-value {
+            flex: 1;
+            font-size: 14px;
+            color: #212529;
+            font-weight: 400;
+            word-break: break-word;
+        }
+
+        .detail-value .status-badge {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .comments-section {
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .comments-label {
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+        }
+
+        .comments-value {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #212529;
+            white-space: pre-line;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background-color: #f7f9fc;
+            border-top: 1px solid #edf1f7;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .date-range {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .date-range i {
+            color: #adb5bd;
+            font-size: 12px;
+        }
+
+        #leaveDetails p {
+            margin: 10px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .confirmation-content {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-confirm {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #666;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-records i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .no-records p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .comments-section {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 1px solid #edf1f7;
+        }
+
+        .comments-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .comments-icon {
+            color: #6c757d;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .comments-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .comments-content {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .comments-value {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #212529;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+
+        .no-comments {
+            font-size: 14px;
+            color: #adb5bd;
+            font-style: italic;
+        }
+
+        .checkbox-cell {
+            width: 0px;
+        }
+
+        /* Enhanced Notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1002;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 350px;
+        }
+
+        .notification {
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+            font-size: 14px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            transform-origin: top right;
+        }
+
+        .notification-header {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            font-weight: 500;
+        }
+
+        .notification.success .notification-header {
+            background-color: var(--success-color);
+        }
+
+        .notification.error .notification-header {
+            background-color: var(--danger-color);
+        }
+
+        .notification.warning .notification-header {
+            background-color: var(--warning-color);
+            color: #333;
+        }
+
+        .notification-header-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-body {
+            padding: 15px;
+            background: white;
+            color: #333;
+        }
+
+        .notification-close {
+            cursor: pointer;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .notification-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .notification-icon {
+            font-size: 18px;
+        }
+
+        .notification-progress {
+            height: 3px;
+            background-color: rgba(255, 255, 255, 0.3);
+            width: 100%;
+        }
+
+        .notification-progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            animation: progress 3s linear forwards;
+        }
+
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(30px) scale(0.9);
+            }
+        }
+
+        /* Action confirmation dialog styles */
+        .action-confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .action-confirmation-content {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 0;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .action-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #edf1f7;
+            position: relative;
+        }
+
+        .action-header.approve {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .action-header.reject {
+            background-color: rgba(255, 82, 82, 0.1);
+            color: var(--danger-color);
+        }
+
+        .action-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .action-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .action-message {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+
+        .btn-action-confirm.approve {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-action-confirm.reject {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .filter-section {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container input {
+                width: 100%;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .confirmation-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .notification-container {
+                top: 10px;
+                right: 10px;
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>LEAVE MANAGEMENT DASHBOARD</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Notification container -->
+        <div id="notificationContainer" class="notification-container"></div>
+
+        <section class="filter-section">
+            <select id="filterStatus">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchEmployee" placeholder="Search by Employee ID...">
+            </div>
+            <button class="btn btn-danger" onclick="showClearConfirmation()">
+                <i class="fas fa-trash"></i> Clear Selected Records
+            </button>
+        </section>
+
+        <div id="tableContainer">
+            <div class="leave-table-container">
+                <table class="leave-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell"><input type="checkbox" id="selectAll"></th>
+                            <th>Employee Name</th>
+                            <th>Employee ID</th>
+                            <th>Leave Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveTableBody">
+                        <!-- Leave requests will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="noRecords" class="no-records" style="display: none;">
+            <i class="fas fa-search"></i>
+            <p>No Records Found</p>
+        </div>
+    </div>
+
+    <!-- Modal for Leave Details -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Leave Request Details</h2>
+                <span class="close">×</span>
+            </div>
+            <div id="leaveDetails"></div>
+            <div class="modal-actions" id="modalActions"></div>
+        </div>
+    </div>
+
+    <!-- Clear Records Confirmation Modal -->
+    <div id="clearConfirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <h3>Clear Selected Records</h3>
+            <p>Are you sure you want to permanently delete the selected leave records? This action cannot be undone.</p>
+            <div class="confirmation-buttons">
+                <button class="btn btn-confirm" onclick="clearSelectedRecords()">
+                    <i class="fas fa-check"></i> Yes, Clear Selected
+                </button>
+                <button class="btn btn-cancel" onclick="hideClearConfirmation()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Confirmation Modal -->
+    <div id="actionConfirmationModal" class="action-confirmation-modal">
+        <div class="action-confirmation-content">
+            <div id="actionHeader" class="action-header">
+                <div id="actionIcon" class="action-icon"></div>
+                <h3 id="actionTitle" class="action-title"></h3>
+            </div>
+            <div class="action-body">
+                <p id="actionMessage" class="action-message"></p>
+                <div class="action-buttons">
+                    <button id="confirmActionBtn" class="btn">
+                        <i class="fas fa-check"></i> <span id="confirmActionText">Confirm</span>
+                    </button>
+                    <button class="btn btn-cancel" onclick="hideActionConfirmation()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to format date to YYYY-MM-DD
+        function formatDate(dateString) {
+            return new Date(dateString).toISOString().split('T')[0];
+        }
+
+        // Prevent space key in search input
+        document.getElementById('searchEmployee').addEventListener('keydown', function(event) {
+            if (event.key === ' ' || event.keyCode === 32) {
+                event.preventDefault();
+            }
+        });
+        
+        // Load all leave requests
+        async function loadRequests() {
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('searchEmployee').value.trim();
+            
+            try {
+                const query = new URLSearchParams();
+                if (status) query.append('status', status);
+                if (search) query.append('employee_id', search);
+                
+                const response = await fetch(`http://localhost:3000/api/leave-requests?${query}`);
+                const requests = await response.json();
+                
+                const tableBody = document.getElementById('leaveTableBody');
+                const tableContainer = document.getElementById('tableContainer');
+                const noRecords = document.getElementById('noRecords');
+                
+                if (requests.length === 0) {
+                    tableContainer.style.display = 'none';
+                    noRecords.style.display = 'block';
+                } else {
+                    tableContainer.style.display = 'block';
+                    noRecords.style.display = 'none';
+                    
+                    tableBody.innerHTML = '';
+                    requests.forEach(request => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${request.id}"></td>
+                            <td>${request.name}</td>
+                            <td>${request.employee_id}</td>
+                            <td>${request.leave_type}</td>
+                            <td>${formatDate(request.start_date)}</td>
+                            <td>${formatDate(request.end_date)}</td>
+                            <td><span class="status-badge status-${request.status}">${request.status.toUpperCase()}</span></td>
+                            <td>
+                                <button class="btn btn-view" onclick="viewLeaveDetails(${request.id})">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                updateSelectAllState();
+            } catch (error) {
+                showNotification('Error loading requests', 'error');
+            }
+        }
+        
+        // View leave details
+        async function viewLeaveDetails(requestId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/leave-requests/${requestId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch leave details');
+                }
+                const request = await response.json();
+                
+                const modal = document.getElementById('leaveModal');
+                const detailsDiv = document.getElementById('leaveDetails');
+                const actionsDiv = document.getElementById('modalActions');
+                
+                detailsDiv.innerHTML = `
+                    <ul class="detail-list">
+                        <li class="detail-item">
+                            <div class="detail-label">Employee</div>
+                            <div class="detail-value">${request.name}</div>
+                        </li>
+                        <li class="detail-item">
+                            <div class="detail-label">Employee ID</div>
+                            <div class="detail-value">${request.employee_id}</div>
+                        </li>
+                        <li class="detail-item">
+                            <div class="detail-label">Leave Type</div>
+                            <div class="detail-value">${request.leave_type}</div>
+                        </li>
+                        <li class="detail-item">
+                            <div class="detail-label">Date Range</div>
+                            <div class="detail-value">
+                                <span class="date-range">
+                                    ${formatDate(request.start_date)} <i class="fas fa-arrow-right"></i> ${formatDate(request.end_date)}
+                                </span>
+                            </div>
+                        </li>
+                        <li class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <span class="status-badge status-${request.status}">${request.status.toUpperCase()}</span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="comments-section">
+                        <span class="comments-label">Comments :</span>
+                        <div class="comments-value">${request.comments || 'No comments provided.'}</div>
+                    </div>
+                `;
+                
+                actionsDiv.innerHTML = request.status === 'pending' ? `
+                    <button class="btn btn-approve" onclick="showActionConfirmation(${request.id}, 'approved', '${request.name}')">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn btn-reject" onclick="showActionConfirmation(${request.id}, 'rejected', '${request.name}')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                ` : '';
+                
+                modal.style.display = 'block';
+            } catch (error) {
+                showNotification('Error fetching leave details', 'error');
+            }
+        }
+        
+        // Show action confirmation dialog
+        function showActionConfirmation(requestId, action, employeeName) {
+            const modal = document.getElementById('actionConfirmationModal');
+            const header = document.getElementById('actionHeader');
+            const icon = document.getElementById('actionIcon');
+            const title = document.getElementById('actionTitle');
+            const message = document.getElementById('actionMessage');
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            const confirmText = document.getElementById('confirmActionText');
+            
+            // Set action specific content
+            if (action === 'approved') {
+                header.className = 'action-header approve';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                title.textContent = 'Approve Leave Request';
+                message.textContent = `Are you sure you want to approve the leave request for ${employeeName}?`;
+                confirmBtn.className = 'btn btn-action-confirm approve';
+                confirmText.textContent = 'Yes, Approve';
+            } else {
+                header.className = 'action-header reject';
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                title.textContent = 'Reject Leave Request';
+                message.textContent = `Are you sure you want to reject the leave request for ${employeeName}?`;
+                confirmBtn.className = 'btn btn-action-confirm reject';
+                confirmText.textContent = 'Yes, Reject';
+            }
+            
+            // Set confirm button action
+            confirmBtn.onclick = function() {
+                updateStatus(requestId, action);
+                document.getElementById('leaveModal').style.display = 'none';
+                hideActionConfirmation();
+            };
+            
+            modal.style.display = 'block';
+        }
+        
+        // Hide action confirmation dialog
+        function hideActionConfirmation() {
+            document.getElementById('actionConfirmationModal').style.display = 'none';
+        }
+        
+        // Show enhanced notification
+        function showNotification(message, type = 'success') {
+            const notificationContainer = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            // Get notification title based on type
+            let title = 'Success';
+            let icon = 'fa-check-circle';
+            
+            if (type === 'error') {
+                title = 'Error';
+                icon = 'fa-exclamation-circle';
+            } else if (type === 'warning') {
+                title = 'Warning';
+                icon = 'fa-exclamation-triangle';
+            }
+            
+            notification.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-header-content">
+                        <i class="fas ${icon} notification-icon"></i>
+                        <span>${title}</span>
+                    </div>
+                    <span class="notification-close">×</span>
+                </div>
+                <div class="notification-body">
+                    ${message}
+                </div>
+                <div class="notification-progress">
+                    <div class="notification-progress-bar"></div>
+                </div>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Animation
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 10);
+            
+            // Close button functionality
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                closeNotification(notification);
+            });
+            
+            // Auto close after 3 seconds
+            setTimeout(() => {
+                closeNotification(notification);
+            }, 3000);
+        }
+        
+        // Close notification with animation
+        function closeNotification(notification) {
+            notification.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+        
+        // Close modal
+        document.querySelector('.close').addEventListener('click', function() {
+            document.getElementById('leaveModal').style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('leaveModal');
+            const actionModal = document.getElementById('actionConfirmationModal');
+            const clearModal = document.getElementById('clearConfirmationModal');
+            
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+            
+            if (event.target === actionModal) {
+                actionModal.style.display = 'none';
+            }
+            
+            if (event.target === clearModal) {
+                clearModal.style.display = 'none';
+            }
+        });
+        
+        // Filter by status
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            loadRequests();
+        });
+        
+        // Search by employee ID
+        document.getElementById('searchEmployee').addEventListener('input', function() {
+            this.value = this.value.replace(/\s/g, ''); // Remove spaces from input value
+            loadRequests();
+        });
+        
+        // Update status of leave request
+        async function updateStatus(requestId, newStatus) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/leave-requests/${requestId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (!response.ok) throw new Error('Failed to update status');
+                
+                loadRequests();
+                showNotification(`Leave request has been ${newStatus} successfully.`);
+            } catch (error) {
+                showNotification('Error updating status', 'error');
+            }
+        }
+        
+        // Show clear confirmation modal
+        function showClearConfirmation() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                showNotification('Please select at least one record to clear.', 'warning');
+                return;
+            }
+            
+            document.getElementById('clearConfirmationModal').style.display = 'block';
+        }
+        
+        // Hide clear confirmation modal
+        function hideClearConfirmation() {
+            document.getElementById('clearConfirmationModal').style.display = 'none';
+        }
+        
+        // Clear selected records
+        async function clearSelectedRecords() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(checkbox => parseInt(checkbox.getAttribute('data-id')));
+            
+            if (selectedIds.length === 0) {
+                showNotification('No records selected.', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/leave-requests', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: selectedIds })
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete records');
+                
+                hideClearConfirmation();
+                loadRequests();
+                showNotification(`${selectedIds.length} record(s) cleared successfully.`);
+            } catch (error) {
+                showNotification('Error deleting records', 'error');
+            }
+        }
+        
+        // Select/deselect all functionality
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSelectAllState();
+        });
+        
+        // Update select all checkbox state
+        function updateSelectAllState() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCheckboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCheckboxes.length === checkboxes.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+        
+        // Event delegation for checkbox changes
+        document.addEventListener('change', function(event) {
+            if (event.target && event.target.classList.contains('row-checkbox')) {
+                updateSelectAllState();
+            }
+        });
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRequests();
+        });
+    </script>
+</body>
+</html>
