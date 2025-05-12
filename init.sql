@@ -1,5 +1,4 @@
-CREATE DATABASE leave_management;
-
+#CREATE DATABASE leave_management;
 -- Create leave_requests table
 CREATE TABLE IF NOT EXISTS leave_requests (
     id SERIAL PRIMARY KEY,

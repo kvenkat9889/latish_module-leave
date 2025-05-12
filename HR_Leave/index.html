@@ -865,7 +865,7 @@
                 if (status) query.append('status', status);
                 if (search) query.append('employee_id', search);
                 
-                const response = await fetch(`http://localhost:3000/api/leave-requests?${query}`);
+                const response = await fetch(`http://98.80.67.100:3000/api/leave-requests?${query}`);
                 const requests = await response.json();
                 
                 // Log the raw API response
@@ -914,7 +914,7 @@
         // View leave details
         async function viewLeaveDetails(requestId) {
             try {
-                const response = await fetch(`http://localhost:3000/api/leave-requests/${requestId}`);
+                const response = await fetch(`http://98.80.67.100:3000/api/leave-requests/${requestId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch leave details');
                 }
@@ -1120,7 +1120,7 @@
         // Update status of leave request
         async function updateStatus(requestId, newStatus) {
             try {
-                const response = await fetch(`http://localhost:3000/api/leave-requests/${requestId}`, {
+                const response = await fetch(`http://98.80.67.100:3000/api/leave-requests/${requestId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
@@ -1163,7 +1163,7 @@
             }
             
             try {
-                const response = await fetch('http://localhost:3000/api/leave-requests', {
+                const response = await fetch('http://98.80.67.100:3000/api/leave-requests', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ids: selectedIds })
