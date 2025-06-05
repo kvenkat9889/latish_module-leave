@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-leave
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: leave_management
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-leave
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    restart: always
+
+  employee_leave:
+    build:
+      context: ./Employee_Leave
+      dockerfile: Dockerfile
+    container_name: employee-leave
+    ports:
+      - "8116:80"
+    restart: always
+
+  hr_leave:
+    build:
+      context: ./HR_Leave
+      dockerfile: Dockerfile
+    container_name: hr-leave
+    ports:
+      - "8117:80"
+    restart: always
+
+volumes:
+  postgres_data:
+
