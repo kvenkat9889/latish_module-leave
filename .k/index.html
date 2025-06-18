@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Request Form</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f9fdff, #ececec);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: fadeInDown 1s;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            width: 100%;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: fadeInDown 1.2s ease-out, gradientShift 15s ease infinite;
+            margin: 0;
+        }
+
+        h2::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+            animation: shimmer 6s linear infinite;
+            pointer-events: none;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            animation: slideRight 2s ease-out forwards;
+            transform-origin: left;
+        }
+
+        @keyframes slideDown {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes slideRight {
+            0% {
+                transform: scaleX(0);
+            }
+            100% {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeInLeft 1s;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            margin-left: 5px;
+        }
+
+        .required::after {
+            content: " *";
+            color: red;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #9b59b6;
+            box-shadow: 0 0 8px rgba(155,89,182,0.2);
+        }
+
+        input.error, select.error, textarea.error {
+            border-color: #ff3860;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #4545ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            animation: bounceIn 1s;
+        }
+
+        button:hover {
+            background: blue;
+            transform: translateY(-2px);
+        }
+
+        /* Improved Notification Styles */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .notification-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-modal {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            padding: 0;
+            overflow: hidden;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .notification-overlay.active .notification-modal {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #43c6ac, #28a745);
+            color: white;
+            display: flex;
+            align-items: center;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-header::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: linear-gradient(transparent, rgba(255, 255, 255, 0.2));
+            transform: rotate(45deg);
+            top: -50%;
+            left: -25%;
+            animation: headerShine 3s infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            30% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .notification-icon {
+            font-size: 28px;
+            margin-right: 15px;
+            animation: pulse 2s infinite;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        .notification-title {
+            flex: 1;
+        }
+
+        .notification-title h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .notification-title p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .notification-body {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .notification-details {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #43c6ac;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            width: 100px;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .detail-icon {
+            color: #43c6ac;
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #333;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+
+        .notification-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 0 25px 25px;
+        }
+
+        .btn-ok, .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+
+        .btn-ok {
+            background: #43c6ac;
+            color: white;
+        }
+
+        .btn-ok:hover {
+            background: #3ab19a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 198, 172, 0.3);
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+
+        .success-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .success-animation.active {
+            opacity: 1;
+            visibility: visible;
+            animation: fadeOut 1s 1.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .checkmark-circle {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            animation: scaleIn 0.5s forwards;
+            transform: scale(0);
+        }
+
+        @keyframes scaleIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .checkmark {
+            color: #43c6ac;
+            font-size: 80px;
+            animation: checkmarkAnimation 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        @keyframes checkmarkAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #43c6ac, #28a745);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .label-with-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .info-icon {
+            margin-left: 5px;
+            color: #4545ff;
+            cursor: pointer;
+            position: relative;
+            margin-top: -7px;
+        }
+
+        .info-tooltip {
+            position: absolute;
+            left: 25px;
+            top: -5px;
+            background-color: #333;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            width: 200px;
+            display: none;
+            z-index: 10;
+            font-size: 12px;
+        }
+
+        .info-icon:hover .info-tooltip {
+            display: block;
+        }
+
+        .character-count {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .error-message {
+            color: #ff3860;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .valid-icon {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            color: #23d160;
+            display: none;
+        }
+
+        #startDateValidIcon, #endDateValidIcon {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            color: #23d160;
+            display: none;
+        }
+
+        .duplicate-error {
+            padding: 15px;
+            background: #ffe8e8;
+            color: #d32f2f;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+            border-left: 4px solid #d32f2f;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                max-width: 900px;
+            }
+
+            h2 {
+                font-size: 1.8em;
+                padding: 20px 15px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 10px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .notification-modal {
+                max-width: 450px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+
+            .header {
+                max-width: 85%;
+            }
+
+            h2 {
+                font-size: 1.6em;
+                padding: 18px 10px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 10px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .notification-modal {
+                max-width: 90%;
+            }
+
+            .notification-header {
+                padding: 15px 20px;
+            }
+
+            .notification-icon {
+                font-size: 22px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .notification-title h3 {
+                font-size: 18px;
+            }
+
+            .notification-title p {
+                font-size: 12px;
+            }
+
+            .notification-body,
+            .notification-buttons {
+                padding: 20px;
+            }
+
+            .toast-notification {
+                min-width: auto;
+                max-width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                max-width: 90%;
+            }
+
+            h2 {
+                font-size: 1.4em;
+                padding: 15px 10px;
+            }
+
+            .container {
+                width: 90%;
+                padding: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .notification-header {
+                padding: 12px 15px;
+            }
+
+            .notification-icon {
+                font-size: 20px;
+                width: 35px;
+                height: 35px;
+                margin-right: 10px;
+            }
+
+            .notification-title h3 {
+                font-size: 16px;
+            }
+
+            .notification-title p {
+                font-size: 12px;
+            }
+
+            .notification-body,
+            .notification-buttons {
+                padding: 15px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 15px;
+            }
+
+            .detail-label {
+                width: 100%;
+                margin-bottom: 2px;
+            }
+
+            .detail-icon {
+                margin-bottom: 2px;
+            }
+
+            .btn-ok, .btn-cancel {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            h2 {
+                font-size: 1.3em;
+                padding: 12px 8px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .notification-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 class="animate__animated animate__fadeInDown">Leave Application Form</h2>
+    </div>
+    <div class="container">
+        <section class="leave-form">
+            <form id="leaveForm" novalidate>
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <label for="employeeName" class="required">Name</label>
+                    <div class="input-container">
+                        <input type="text" id="employeeName" placeholder="Enter your name" required minlength="5" maxlength="50">
+                        <i class="fas fa-check valid-icon" id="nameValidIcon"></i>
+                    </div>
+                    <div id="nameError" class="error-message">Name must contain at least 5 alphabetical characters.</div>
+                </div>
+
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <div class="label-with-info">
+                        <label for="employeeId" class="required">Employee ID</label>
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="info-tooltip">Employee ID format: ATS0XXX</div>
+                        </div>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="employeeId" placeholder="Enter your employee ID" required minlength="7" maxlength="7">
+                        <i class="fas fa-check valid-icon" id="idValidIcon"></i>
+                    </div>
+                    <div id="idError" class="error-message">Please enter a valid employee ID (format: ATS0XXX).</div>
+                </div>
+
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <label for="leaveType" class="required">Leave Type</label>
+                    <select id="leaveType" required>
+                        <option value="" disabled selected>Select Leave Type</option>
+                        <option value="vacational">Vacational Leave</option>
+                        <option value="sick">Sick Leave</option>
+                        <option value="personal">Personal Leave</option>
+                        <option value="casual">Casual Leave</option>
+                        <option value="Maternity">Maternity Leave</option>
+                    </select>
+                    <div id="leaveTypeError" class="error-message">Please select a leave type.</div>
+                </div>
+
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <label for="startDate" class="required">Start Date</label>
+                    <div class="input-container">
+                        <input type="date" id="startDate" required>
+                        <i class="fas fa-check valid-icon" id="startDateValidIcon"></i>
+                    </div>
+                    <div id="startDateError" class="error-message">Please select a valid start date.</div>
+                </div>
+
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <label for="endDate" class="required">End Date</label>
+                    <div class="input-container">
+                        <input type="date" id="endDate" required>
+                        <i class="fas fa-check valid-icon" id="endDateValidIcon"></i>
+                    </div>
+                    <div id="endDateError" class="error-message">End date cannot be earlier than start date.</div>
+                </div>
+
+                <div class="form-group animate__animated animate__fadeInLeft">
+                    <label for="comments" class="required">Comments</label>
+                    <div class="textarea-container">
+                        <textarea id="comments" placeholder="Enter your comments (10-300 characters)" required minlength="10" maxlength="300"></textarea>
+                        <div id="charCount" class="character-count">0/300</div>
+                    </div>
+                    <div id="commentsError" class="error-message">Comments must be 10 to 300 characters.</div>
+                </div>
+
+                <div id="duplicateError" class="duplicate-error">
+                    <i class="fas fa-exclamation-circle"></i> You already have a leave request for this date. Please choose a different date.
+                </div>
+
+                <button type="submit" class="animate__animated animate__bounceIn" aria-label="Submit leave request">Submit Request</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Notification Components -->
+    <div class="notification-overlay" id="notificationOverlay">
+        <div class="notification-modal">
+            <div class="notification-header">
+                <div class="notification-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="notification-title">
+                    <h3>Confirm Leave Request</h3>
+                    <p>Please review your leave request details</p>
+                </div>
+            </div>
+            <div class="notification-body">
+                <div class="notification-details">
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-user"></i></div>
+                        <div class="detail-label">Name:</div>
+                        <div class="detail-value" id="summaryName"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-id-card"></i></div>
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value" id="summaryId"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-tag"></i></div>
+                        <div class="detail-label">Leave Type:</div>
+                        <div class="detail-value" id="summaryType"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="detail-label">Duration:</div>
+                        <div class="detail-value" id="summaryDuration"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-comment"></i></div>
+                        <div class="detail-label">Comments:</div>
+                        <div class="detail-value" id="summaryComments"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-buttons">
+                <button class="btn-cancel" id="cancelBtn" aria-label="Cancel leave request">
+                    <i class="fas fa-times btn-icon"></i>Cancel
+                </button>
+                <button class="btn-ok" id="confirmBtn" aria-label="Confirm leave request">
+                    <i class="fas fa-check btn-icon"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-animation" id="successAnimation">
+        <div class="checkmark-circle">
+            <i class="fas fa-check-circle checkmark"></i>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toastNotification">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-content">
+            <h4>Leave Request Submitted!</h4>
+            <p>Your leave application has been successfully submitted.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const leaveTypeSelect = document.getElementById('leaveType');
+            const leaveForm = document.getElementById('leaveForm');
+            const notificationOverlay = document.getElementById('notificationOverlay');
+            const successAnimation = document.getElementById('successAnimation');
+            const toastNotification = document.getElementById('toastNotification');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const commentsTextarea = document.getElementById('comments');
+            const charCount = document.getElementById('charCount');
+            const employeeNameInput = document.getElementById('employeeName');
+            const employeeIdInput = document.getElementById('employeeId');
+
+            // Form submission
+            leaveForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                validateName();
+                validateEmployeeId();
+                validateLeaveType();
+                validateDates();
+                validateComments();
+                if (isFormValid()) {
+                    showConfirmation();
+                }
+            });
+
+            function isFormValid() {
+                return validateName() &&
+                       validateEmployeeId() &&
+                       validateLeaveType() &&
+                       validateDates() &&
+                       validateComments();
+            }
+
+            // Update date ranges based on leave type
+            function updateDateRanges() {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const nextYear = currentYear + 1;
+
+                const minDate = new Date(today);
+                minDate.setDate(today.getDate() - 45);
+
+                startDateInput.min = minDate.toISOString().split('T')[0];
+                endDateInput.min = minDate.toISOString().split('T')[0];
+                startDateInput.max = `${nextYear}-12-31`;
+                endDateInput.max = `${nextYear}-12-31`;
+
+                if (leaveTypeSelect.value === 'Maternity') {
+                    const maternityMaxDate = new Date(today);
+                    maternityMaxDate.setMonth(maternityMaxDate.getMonth() + 2);
+                    const maxDateFormatted = maternityMaxDate.toISOString().split('T')[0];
+                    startDateInput.max = maxDateFormatted;
+                    endDateInput.max = maxDateFormatted;
+                }
+            }
+
+            leaveTypeSelect.addEventListener('change', function() {
+                updateDateRanges();
+                validateLeaveType();
+            });
+
+            updateDateRanges();
+
+            // Show confirmation modal with details
+            function showConfirmation() {
+                const name = employeeNameInput.value.trim();
+                const id = employeeIdInput.value.trim();
+                const type = leaveTypeSelect.options[leaveTypeSelect.selectedIndex].text;
+                const startDate = formatDate(startDateInput.value);
+                const endDate = formatDate(endDateInput.value);
+                const comments = commentsTextarea.value.trim();
+
+                document.getElementById('summaryName').textContent = name || 'N/A';
+                document.getElementById('summaryId').textContent = id || 'N/A';
+                document.getElementById('summaryType').textContent = type || 'N/A';
+                document.getElementById('summaryDuration').textContent = startDate && endDate ? `${startDate} to ${endDate}` : 'N/A';
+                document.getElementById('summaryComments').textContent = comments || 'N/A';
+
+                notificationOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Format date to readable format
+            function formatDate(dateString) {
+                if (!dateString || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) return 'N/A';
+                const date = new Date(dateString);
+                if (isNaN(date)) return 'N/A';
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            // Confirmation buttons
+            confirmBtn.addEventListener('click', async function() {
+                notificationOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+
+                const success = await submitForm();
+                if (success) {
+                    successAnimation.classList.add('active');
+
+                    setTimeout(function() {
+                        toastNotification.classList.add('show');
+                        setTimeout(() => {
+                            toastNotification.classList.remove('show');
+                        }, 4000);
+                    }, 2000);
+
+                    // Reset form
+                    leaveForm.reset();
+                    charCount.textContent = '0/300';
+                    resetValidation();
+                    updateDateRanges();
+                }
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                notificationOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Character count for comments
+            commentsTextarea.addEventListener('input', function() {
+                let value = this.value;
+                value = value.replace(/\s+/g, ' ');
+                this.value = value;
+                const currentLength = this.value.length;
+                charCount.textContent = `${currentLength}/300`;
+                validateComments();
+            });
+
+            // Validation helper functions
+            function showError(inputElement, errorElement) {
+                inputElement.classList.add('error');
+                errorElement.classList.add('visible');
+                const validIcon = document.getElementById(inputElement.id + 'ValidIcon');
+                if (validIcon) validIcon.style.display = 'none';
+            }
+
+            function hideError(inputElement, errorElement) {
+                inputElement.classList.remove('error');
+                errorElement.classList.remove('visible');
+                const validIcon = document.getElementById(inputElement.id + 'ValidIcon');
+                if (validIcon && inputElement.value.trim() !== '') {
+                    validIcon.style.display = 'block';
+                }
+            }
+
+            function preventSpaceOnlyInput(inputElement) {
+                inputElement.addEventListener('input', function() {
+                    if (this.value.trim() === '' && this.value !== '') {
+                        this.value = '';
+                    }
+                });
+            }
+
+            // Name validation
+            function validateName() {
+                const value = employeeNameInput.value;
+                const trimmedValue = value.trim();
+                const nameAlphaCount = trimmedValue.replace(/[^A-Za-z]/g, '').length;
+
+                if (trimmedValue === '' || nameAlphaCount < 5) {
+                    showError(employeeNameInput, document.getElementById('nameError'));
+                    return false;
+                } else {
+                    hideError(employeeNameInput, document.getElementById('nameError'));
+                    return true;
+                }
+            }
+
+            employeeNameInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                value = value.replace(/[^A-Za-z\s]/g, '').replace(/\s+/g, ' ');
+                e.target.value = value;
+                validateName();
+            });
+
+            employeeNameInput.addEventListener('blur', function() {
+                this.value = this.value.trim();
+                validateName();
+            });
+
+            preventSpaceOnlyInput(employeeNameInput);
+
+            // Employee ID validation
+            function validateEmployeeId() {
+                const value = employeeIdInput.value;
+                const trimmedValue = value.trim();
+
+                if (trimmedValue === '' || !/^ATS0(?!000)\d{3}$/.test(trimmedValue)) {
+                    showError(employeeIdInput, document.getElementById('idError'));
+                    return false;
+                } else {
+                    hideError(employeeIdInput, document.getElementById('idError'));
+                    return true;
+                }
+            }
+
+            employeeIdInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                const filteredValue = value.replace(/[^A-Z0-9]/g, '');
+                if (value !== filteredValue) {
+                    e.target.value = filteredValue;
+                }
+                e.target.value = e.target.value.toUpperCase();
+                if (e.target.value.length >= 1 && !e.target.value.startsWith('ATS0')) {
+                    const digits = e.target.value.replace(/\D/g, '');
+                    e.target.value = 'ATS0' + digits.slice(0, 3);
+                }
+                validateEmployeeId();
+            });
+
+            employeeIdInput.addEventListener('blur', function() {
+                this.value = this.value.trim();
+                validateEmployeeId();
+            });
+
+            preventSpaceOnlyInput(employeeIdInput);
+
+            // Leave type validation
+            function validateLeaveType() {
+                if (!leaveTypeSelect.value) {
+                    showError(leaveTypeSelect, document.getElementById('leaveTypeError'));
+                    return false;
+                } else {
+                    hideError(leaveTypeSelect, document.getElementById('leaveTypeError'));
+                    return true;
+                }
+            }
+
+            leaveTypeSelect.addEventListener('change', validateLeaveType);
+
+            // Date validation
+            startDateInput.addEventListener('input', validateDates);
+            endDateInput.addEventListener('input', validateDates);
+
+            startDateInput.addEventListener('blur', function() {
+                validateDates();
+            });
+
+            endDateInput.addEventListener('blur', function() {
+                validateDates();
+            });
+
+            startDateInput.addEventListener('change', validateDates);
+            endDateInput.addEventListener('change', validateDates);
+
+            function isValidDate(dateString) {
+                if (!dateString || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+                const date = new Date(dateString);
+                return !isNaN(date);
+            }
+
+            function validateDates() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                const today = new Date();
+                const currentYear = today.getFullYear();
+
+                const minDateCalc = new Date(today);
+                minDateCalc.setDate(today.getDate() - 45);
+                const minDate = minDateCalc.toISOString().split('T')[0];
+
+                const maxDate = `${currentYear + 1}-12-31`;
+
+                let startDateValid = true;
+                let endDateValid = true;
+
+                let maternityMaxFormatted = maxDate;
+                if (leaveTypeSelect.value === 'Maternity') {
+                    const maternityMaxDate = new Date(today);
+                    maternityMaxDate.setMonth(maternityMaxDate.getMonth() + 2);
+                    maternityMaxFormatted = maternityMaxDate.toISOString().split('T')[0];
+                }
+
+                if (startDate) {
+                    const startDateObj = new Date(startDate);
+                    if (!isValidDate(startDate) ||
+                        startDateObj < new Date(minDate) ||
+                        startDateObj > new Date(maternityMaxFormatted)) {
+                        showError(startDateInput, document.getElementById('startDateError'));
+                        startDateValid = false;
+                    } else {
+                        hideError(startDateInput, document.getElementById('startDateError'));
+                    }
+                } else {
+                    showError(startDateInput, document.getElementById('startDateError'));
+                    startDateValid = false;
+                }
+
+                if (endDate) {
+                    const endDateObj = new Date(endDate);
+                    if (!isValidDate(endDate) ||
+                        (startDate && isValidDate(startDate) && endDateObj < new Date(startDate)) ||
+                        endDateObj < new Date(minDate) ||
+                        endDateObj > new Date(maternityMaxFormatted)) {
+                        showError(endDateInput, document.getElementById('endDateError'));
+                        endDateValid = false;
+                    } else {
+                        hideError(endDateInput, document.getElementById('endDateError'));
+                    }
+                } else {
+                    showError(endDateInput, document.getElementById('endDateError'));
+                    endDateValid = false;
+                }
+
+                return startDateValid && endDateValid;
+            }
+
+            // Comments validation
+            function validateComments() {
+                const comments = commentsTextarea.value;
+                const trimmedComments = comments.trim();
+
+                if (trimmedComments === '' || trimmedComments.length < 10 || trimmedComments.length > 300) {
+                    showError(commentsTextarea, document.getElementById('commentsError'));
+                    return false;
+                } else {
+                    hideError(commentsTextarea, document.getElementById('commentsError'));
+                    return true;
+                }
+            }
+
+            commentsTextarea.addEventListener('blur', function() {
+                this.value = this.value.trim();
+                validateComments();
+                charCount.textContent = `${this.value.length}/300`;
+            });
+
+            preventSpaceOnlyInput(commentsTextarea);
+
+            // Form submission logic
+            async function submitForm() {
+                const leaveRequest = {
+                    name: employeeNameInput.value.trim(),
+                    employee_id: employeeIdInput.value.trim(),
+                    leave_type: leaveTypeSelect.value,
+                    start_date: startDateInput.value,
+                    end_date: endDateInput.value,
+                    comments: commentsTextarea.value.trim()
+                };
+
+                try {
+                    const response = await fetch('http://3.85.61.23:3004/api/leave-requests', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(leaveRequest)
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const duplicateError = document.getElementById('duplicateError');
+                        duplicateError.textContent = error.error || 'You already have a leave request for this date. Please choose a different date.';
+                        duplicateError.style.display = 'block';
+                        duplicateError.className = 'duplicate-error animate__animated animate__shakeX';
+                        setTimeout(() => {
+                            duplicateError.style.display = 'none';
+                        }, 4000);
+                        return false;
+                    }
+
+                    return true;
+                } catch (error) {
+                    const duplicateError = document.getElementById('duplicateError');
+                    duplicateError.textContent = 'Error submitting request. Please try again.';
+                    duplicateError.style.display = 'block';
+                    duplicateError.className = 'duplicate-error animate__animated animate__shakeX';
+                    setTimeout(() => {
+                        duplicateError.style.display = 'none';
+                    }, 4000);
+                    return false;
+                }
+            }
+
+            // Reset validation
+            function resetValidation() {
+                const inputs = document.querySelectorAll('input, select, textarea');
+                const errorMessages = document.querySelectorAll('.error-message');
+                const validIcons = document.querySelectorAll('.valid-icon');
+
+                inputs.forEach(input => input.classList.remove('error'));
+                errorMessages.forEach(msg => msg.classList.remove('visible'));
+                validIcons.forEach(icon => icon.style.display = 'none');
+                document.getElementById('duplicateError').style.display = 'none';
+            }
+
+            // Mobile enhancements
+            if (window.innerWidth <= 768) {
+                const inputs = document.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function() {
+                        this.style.backgroundColor = '#f9f9ff';
+                    });
+                    input.addEventListener('blur', function() {
+                        this.style.backgroundColor = '';
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

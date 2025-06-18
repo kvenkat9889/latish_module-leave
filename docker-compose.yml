@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     container_name: postgres-leave
     ports:
-      - "5433:5432"
+      - "5004:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin123
@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend-leave
     ports:
-      - "3001:3001"
+      - "3004:3004"
     depends_on:
       - postgres
     restart: always
@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile
     container_name: employee-leave
     ports:
-      - "8116:80"
+      - "7009:80"
     restart: always
 
   hr_leave:
@@ -40,7 +40,7 @@ services:
       dockerfile: Dockerfile
     container_name: hr-leave
     ports:
-      - "8117:80"
+      - "7010:80"
     restart: always
 
 volumes:
